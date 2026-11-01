@@ -11,7 +11,7 @@ if not TOKEN:
 
 # Bot Setup
 
-bot = commands.Bot(command_prefix="/", intents=discord.Intents.default())
+bot = commands.Bot(command_prefix="/", intents=discord.Intents.default(), help_command=None)
 
 
 # Embed Template
@@ -207,6 +207,39 @@ class EmbedGroup(app_commands.Group):
 
 bot.tree.add_command(EmbedGroup())
 
+# Help Slash Command
+
+@bot.tree.command(
+    name="help",
+    description="Show bot commands and instructions"
+)
+async def help_command(interaction: discord.Interaction):
+
+    embed = discord.Embed(
+        title="Bot Help",
+        description="Here are the available commands.",
+        color=discord.Color.from_rgb(178, 134, 223)
+    )
+
+    embed.add_field(
+        name="/embed create",
+        value="Create a new embed template.",
+        inline=False
+    )
+
+    embed.add_field(
+        name="/help",
+        value="Show this help menu.",
+        inline=False
+    )
+
+    embed.set_footer(text="Bot Help Menu")
+
+    await interaction.response.send_message(
+        embed=embed,
+        ephemeral=True
+    )
+
 
 # Bot Ready
 @bot.event
@@ -218,5 +251,14 @@ async def on_ready():
     print(f"Bot Online! Logged in as {bot.user}")
 
 
+# ////////////////// Commands /////////////////////
+
+@bot.command()
+async def szRynhelp(ctx):
+    help_message = (
+        "Available Commands:\n"
+        "/embed create <name> greet - Create a greet embed template.\n"
+    )
+    await ctx.send(help_message)
 
 bot.run(TOKEN)
