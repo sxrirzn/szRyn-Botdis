@@ -15,19 +15,30 @@ if not TOKEN:
 
 class MyBot(commands.Bot):
 
-    async def setup_hook(self):
-        extensions = [
-            "commands.help",
-            "commands.embed",
-            "commands.settings"
-        ]
+   async def setup_hook(self):
+    extensions = [
+        "commands.help",
+        "commands.embed",
+        "commands.settings"
+    ]
 
-        for extension in extensions:
-            await self.load_extension(extension)
-            print(f"Loaded extension: {extension}")
+    for extension in extensions:
+        await self.load_extension(extension)
+        print(f"Loaded extension: {extension}")
 
-        await self.tree.sync()
-        print("Slash Commands Synced!")
+    print("\n--- Registered Slash Commands ---")
+
+    for command in self.tree.get_commands():
+        if isinstance(command, app_commands.Group):
+            print(f"Group: /{command.name}")
+
+            for subcommand in command.commands:
+                print(f"  Subcommand: /{command.name} {subcommand.name}")
+        else:
+            print(f"Command: /{command.name}")
+
+    await self.tree.sync()
+    print("\nSlash Commands Synced!")
 
 
 bot = MyBot(
