@@ -43,14 +43,22 @@ class EmbedEditModal(discord.ui.Modal):
             self.add_item(self.title_input)
             self.add_item(self.description_input)
             self.add_item(self.color_input)
-
         elif edit_type == "Author":
             self.author_input = discord.ui.TextInput(
-                label="Author Name",
+                label="Author Text",
+                placeholder="{USER_TAG}",
+                required=False,
+                max_length=256
+            )
+
+            self.author_image_input = discord.ui.TextInput(
+                label="Author Image (Optional)",
+                placeholder="{USER_AVATAR}",
                 required=False
             )
-            self.add_item(self.author_input)
 
+            self.add_item(self.author_input)
+            self.add_item(self.author_image_input)
         elif edit_type == "Footer":
             self.footer_input = discord.ui.TextInput(
                 label="Footer Text",
@@ -93,8 +101,24 @@ class EmbedEditModal(discord.ui.Modal):
                     return
 
         elif self.edit_type == "Author":
+            author_text = self.author_input.value
+            author_image = self.author_image_input.value
+
+            if author_text:
+                author_text = author_text.replace(
+                    "{USER_TAG}",
+                    interaction.user.mention
+                )
+
+            if author_image:
+                author_image = author_image.replace(
+                    "{USER_AVATAR}",
+                    interaction.user.display_avatar.url
+                )
+
             embed.set_author(
-                name=self.author_input.value or None
+                name=author_text or None,
+                icon_url=author_image or None
             )
 
         elif self.edit_type == "Footer":
@@ -198,4 +222,3 @@ class EmbedGroup(app_commands.Group):
 async def setup(bot):
     bot.tree.add_command(EmbedGroup())
 
-    
