@@ -18,7 +18,8 @@ class MyBot(commands.Bot):
     async def setup_hook(self):
         extensions = [
             "commands.help",
-            "commands.embed"
+            "commands.embed",
+            "commands.settings"
         ]
 
         for extension in extensions:
