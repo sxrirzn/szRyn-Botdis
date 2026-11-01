@@ -11,7 +11,18 @@ if not TOKEN:
 
 # Bot Setup
 
-bot = commands.Bot(command_prefix="/", intents=discord.Intents.default(), help_command=None)
+class MyBot(commands.Bot):
+
+    async def setup_hook(self):
+        await self.tree.sync()
+        print("Slash Commands Synced!")
+
+
+bot = MyBot(
+    command_prefix="!",
+    intents=discord.Intents.default(),
+    help_command=None
+)
 
 
 # Embed Template
@@ -218,12 +229,15 @@ async def help_command(interaction: discord.Interaction):
     embed = discord.Embed(
         title="Bot Help",
         description="Here are the available commands.",
-        color=discord.Color.from_rgb(178, 134, 223)
+        color=discord.Color.from_rgb(182, 0, 199)
     )
 
     embed.add_field(
         name="/embed create",
-        value="Create a new embed template.",
+        value=(
+            "Create a new embed template.\n"
+            "• NAME: Enter `greet` to create the greet embed template."
+        ),
         inline=False
     )
 
@@ -240,25 +254,38 @@ async def help_command(interaction: discord.Interaction):
         ephemeral=True
     )
 
+# Slash Command Error Handler
+
+@bot.tree.error
+async def on_app_command_error(
+    interaction: discord.Interaction,
+    error: app_commands.AppCommandError
+):
+
+    print(f"Slash Command Error: {error}")
+
+    message = "An unexpected error occurred while executing this command."
+
+    if interaction.response.is_done():
+        await interaction.followup.send(
+            message,
+            ephemeral=True
+        )
+    else:
+        await interaction.response.send_message(
+            message,
+            ephemeral=True
+        )
 
 # Bot Ready
+
 @bot.event
 async def on_ready():
-    if not getattr(bot, "synced", False):
-        await bot.tree.sync()
-        bot.synced = True
-
     print(f"Bot Online! Logged in as {bot.user}")
 
 
 # ////////////////// Commands /////////////////////
 
-@bot.command()
-async def szRynhelp(ctx):
-    help_message = (
-        "Available Commands:\n"
-        "/embed create <name> greet - Create a greet embed template.\n"
-    )
-    await ctx.send(help_message)
+
 
 bot.run(TOKEN)
