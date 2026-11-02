@@ -72,11 +72,20 @@ async def on_app_command_error(
         )
 
 
-# Bot Ready
+# Bot Events
 
 @bot.event
 async def on_ready():
     print(f"Bot Online! Logged in as {bot.user}")
+
+
+@bot.event
+async def on_member_join(member):
+    channel_id = 1234567891231234564 # Replace with your desired channel ID
+    channel = bot.get_channel(channel_id)
+
+    if channel:
+        await channel.send(f"Welcome {member.mention}!")
 
 
 # Run Bot

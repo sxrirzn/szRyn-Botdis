@@ -30,14 +30,14 @@ class Help(commands.Cog):
         )
 
         embed.add_field(
-            name="/help",
-            value="Show this help menu.",
-            inline=False
-        )
-
-        embed.add_field(
             name="/set greet",
             value="Set the bot’s message channel.",
+            inline=False
+        )
+        
+        embed.add_field(
+            name="/help",
+            value="Show this help menu.",
             inline=False
         )
 

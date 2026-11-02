@@ -214,7 +214,7 @@ class EmbedGroup(app_commands.Group):
             )
         else:
             await interaction.followup.send(
-                f"ไม่พบ Embed Template ชื่อ `{name}`",
+                f"Not found Embed Template name `{name}`",
                 ephemeral=True
             )
 
