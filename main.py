@@ -40,6 +40,8 @@ class MyBot(commands.Bot):
     await self.tree.sync()
     print("\nSlash Commands Synced!")
 
+intents = discord.Intents.default()
+intents.members = True
 
 bot = MyBot(
     command_prefix="!",
