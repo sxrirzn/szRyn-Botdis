@@ -45,7 +45,7 @@ intents.members = True
 
 bot = MyBot(
     command_prefix="!",
-    intents=discord.Intents.default(),
+    intents=intents,
     help_command=None
 )
 
@@ -81,13 +81,42 @@ async def on_ready():
     print(f"Bot Online! Logged in as {bot.user}")
 
 
+
 @bot.event
 async def on_member_join(member):
-    channel_id = 1234567891231234564 # Replace with your desired channel ID
-    channel = bot.get_channel(channel_id)
 
-    if channel:
-        await channel.send(f"Welcome {member.mention}!")
+    config = load_config()
+
+    guild_id = str(member.guild.id)
+
+    channel_id = config.get(guild_id, {}).get("greet_channel")
+
+    if not channel_id:
+        print("Welcome channel has not been set.")
+        return
+
+    channel = bot.get_channel(int(channel_id))
+
+    if channel is None:
+        try:
+            channel = await bot.fetch_channel(int(channel_id))
+        except discord.NotFound:
+            print("Welcome channel not found.")
+            return
+
+    if isinstance(channel, discord.TextChannel):
+        try:
+            await channel.send(
+                f"Welcome {member.mention}!"
+            )
+
+            print(f"Welcome message sent to {channel.name}")
+
+        except discord.Forbidden:
+            print("Missing permission to send welcome message.")
+
+        except discord.HTTPException as e:
+            print(f"Welcome Event Error: {e}")
 
 
 # Run Bot

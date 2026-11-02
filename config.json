@@ -1,5 +1,21 @@
 {
+    "Server ID": {
+        "greet_channel": 123456789012345678
+    },
     "1566109722921275422": {
-        "greet_channel": 1566213068671684709
+        "greet_channel": 1566213068671684709,
+        "embed_templates": {
+            "greet": {
+                "author": {
+                    "name": "{USER_NAME}"
+                },
+                "flags": 0,
+                "color": 11699935,
+                "type": "rich",
+                "description": "Hello!",
+                "title": "Welcome!"
+            }
+        },
+        "greet_author_avatar": true
     }
 }
