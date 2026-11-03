@@ -41,6 +41,12 @@ class Help(commands.Cog):
             inline=False
         )
 
+        embed.add_field(
+            name="/test greet",
+            value="Test the greet embed template.",
+            inline=False
+        )
+
         embed.set_footer(text="Bot Help Menu")
 
         await interaction.response.send_message(
