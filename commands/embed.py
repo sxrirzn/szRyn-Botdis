@@ -230,6 +230,14 @@ class EmbedEditorView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=300)
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user.guild_permissions.manage_guild:
+            return True
+        await interaction.response.send_message(
+            "You do not have permission to edit this embed.", ephemeral=True
+        )
+        return False
+    
     @discord.ui.button(
         label="Edit Basic Information",
         style=discord.ButtonStyle.primary,
@@ -278,7 +286,9 @@ class EmbedGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
             name="embed",
-            description="Embed management commands"
+            description="Embed management commands",
+            guild_only=True,
+            default_permissions=discord.Permissions(manage_guild=True)
         )
 
     @app_commands.command(
@@ -302,13 +312,22 @@ class EmbedGroup(app_commands.Group):
             )
             return
 
-        embed = create_greet_embed()
-
-        save_embed_template(
-            interaction.guild.id,
-            name.lower(),
-            embed
+        config = load_config()
+        existing = (
+            config.get(str(interaction.guild.id), {})
+            .get("embed_templates", {})
+            .get(name.lower())
         )
+
+        if existing:
+            embed = discord.Embed.from_dict(existing)
+        else:
+            embed = create_greet_embed()
+            save_embed_template(
+                interaction.guild.id,
+                name.lower(),
+                embed
+            )
 
         await interaction.response.send_message(
             content=f"Created an embed with name `{name}`.",

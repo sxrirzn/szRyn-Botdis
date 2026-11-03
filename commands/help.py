@@ -36,14 +36,14 @@ class Help(commands.Cog):
         )
         
         embed.add_field(
-            name="/help",
-            value="Show this help menu.",
+            name="/test greet",
+            value="Test the greet embed template.",
             inline=False
         )
 
         embed.add_field(
-            name="/test greet",
-            value="Test the greet embed template.",
+            name="/help",
+            value="Show this help menu.",
             inline=False
         )
 

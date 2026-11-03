@@ -19,7 +19,8 @@ class MyBot(commands.Bot):
     extensions = [
         "commands.help",
         "commands.embed",
-        "commands.settings"
+        "commands.settings",
+        "commands.reaction_role"
     ]
 
     for extension in extensions:
