@@ -42,6 +42,39 @@ class Help(commands.Cog):
         )
 
         embed.add_field(
+            name="/reaction_role add",
+            value=(
+                "Add a reaction role to a message.\n"
+                "• **MESSAGE_ID:** Enter the ID of the message you want to add the reaction role to.\n"
+                "• **EMOJI:** Enter the emoji for the reaction role.\n"
+                "• **ROLE:** Select the role to assign when the reaction is added."
+            ),
+            inline=False
+        )
+
+        embed.add_field(
+            name="/reaction_role list",
+            value="Show all reaction roles set up in this server.",
+            inline=False
+        )
+
+        embed.add_field(
+            name="/reaction_role panel",
+            value="Create a Text Panel for reaction roles.",
+            inline=False
+        )
+
+        embed.add_field(
+            name="/reaction_role remove",
+            value=(
+                "Remove a reaction role from a message.\n"
+                "• **MESSAGE_ID:** Enter the ID of the message you want to remove the reaction role from.\n"
+                "• **EMOJI:** Enter the emoji for the reaction role."
+            ),
+            inline=False
+        )
+
+        embed.add_field(
             name="/help",
             value="Show this help menu.",
             inline=False
