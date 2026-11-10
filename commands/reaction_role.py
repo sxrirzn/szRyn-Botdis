@@ -52,7 +52,7 @@ class ReactionRole(commands.GroupCog, group_name="reactionrole", group_descripti
             ephemeral=True,
         )
 
-    @app_commands.command(name="add", description="Link emojis to roles on a message (up to 5 pairs at once)")
+    @app_commands.command(name="add", description="Link emojis to roles on a message (up to 7 pairs at once)" "Run it in the message's channel.")
     @app_commands.describe(
         message_id="Message ID (right-click > Copy Message ID)",
         emoji1="Emoji 1", role1="Role 1",
@@ -60,6 +60,8 @@ class ReactionRole(commands.GroupCog, group_name="reactionrole", group_descripti
         emoji3="Emoji 3", role3="Role 3",
         emoji4="Emoji 4", role4="Role 4",
         emoji5="Emoji 5", role5="Role 5",
+        emoji6="Emoji 6", role6="Role 6",
+        emoji7="Emoji 7", role7="Role 7",
     )
     async def add(
         self,
@@ -70,6 +72,8 @@ class ReactionRole(commands.GroupCog, group_name="reactionrole", group_descripti
         emoji3: Optional[str] = None, role3: Optional[discord.Role] = None,
         emoji4: Optional[str] = None, role4: Optional[discord.Role] = None,
         emoji5: Optional[str] = None, role5: Optional[discord.Role] = None,
+        emoji6: Optional[str] = None, role6: Optional[discord.Role] = None,
+        emoji7: Optional[str] = None, role7: Optional[discord.Role] = None,
     ):
         if not message_id.isdigit():
             return await interaction.response.send_message("message_id must be a number.", ephemeral=True)
@@ -77,7 +81,7 @@ class ReactionRole(commands.GroupCog, group_name="reactionrole", group_descripti
         # Collect the pairs that were filled in (each emoji needs a matching role)
         raw_pairs = [
             (emoji1, role1), (emoji2, role2), (emoji3, role3),
-            (emoji4, role4), (emoji5, role5),
+            (emoji4, role4), (emoji5, role5), (emoji6, role6), (emoji7, role7)
         ]
         pairs = []
         for emoji, role in raw_pairs:
