@@ -20,7 +20,8 @@ class MyBot(commands.Bot):
         "commands.help",
         "commands.embed",
         "commands.settings",
-        "commands.reaction_role"
+        "commands.reaction_role",
+        "commands.TTS"
     ]
 
     for extension in extensions:
