@@ -135,7 +135,15 @@ class SetGroup(app_commands.Group):
             ephemeral=True
         )
 
+class SetGroup(app_commands.Group):
 
+    def __init__(self):
+        super().__init__(
+            name="set",
+            description="Bot settings",
+            guild_only=True,
+            default_permissions=discord.Permissions(manage_guild=True)
+        )
 
 # /test commands
 
@@ -233,6 +241,15 @@ class TestGroup(app_commands.Group):
                 ephemeral=True
             )
 
+class TestGroup(app_commands.Group):
+
+    def __init__(self):
+        super().__init__(
+            name="test",
+            description="Test bot features",
+            guild_only=True,
+            default_permissions=discord.Permissions(manage_guild=True)
+        )
 
 async def setup(bot):
     bot.tree.add_command(SetGroup())
