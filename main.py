@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 import json
 import os
 
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
+
 CONFIG_FILE = "config.json"
 
 def load_config():
@@ -22,8 +25,6 @@ def save_config(config):
         json.dump(config, f, ensure_ascii=False, indent=4)
 
         
-load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
 
 if not TOKEN:
     raise RuntimeError("DISCORD_TOKEN not found. Please set the token first.")
