@@ -4,7 +4,25 @@ from discord import app_commands
 from discord.ext import commands
 
 import os
+from dotenv import load_dotenv
 
+import json
+import os
+
+CONFIG_FILE = "config.json"
+
+def load_config():
+    if not os.path.exists(CONFIG_FILE):
+        return {}
+    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def save_config(config):
+    with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+        json.dump(config, f, ensure_ascii=False, indent=4)
+
+        
+load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 if not TOKEN:
@@ -43,6 +61,7 @@ class MyBot(commands.Bot):
     print("\nSlash Commands Synced!")
 
 intents = discord.Intents.default()
+intents.message_content = True
 intents.members = True
 
 bot = MyBot(
@@ -122,5 +141,9 @@ async def on_member_join(member):
 
 
 # Run Bot
+
+import logging
+logging.getLogger("discord.voice_state").setLevel(logging.DEBUG)
+logging.getLogger("discord.player").setLevel(logging.DEBUG)
 
 bot.run(TOKEN)

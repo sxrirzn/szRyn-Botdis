@@ -126,6 +126,8 @@ class TTS(commands.Cog):
             return await interaction.followup.send(f"Failed to join: {e}", ephemeral=True)
 
         self._start_session(interaction.guild_id, interaction.channel_id)
+        vc = interaction.guild.voice_client
+        vc.play(discord.FFmpegPCMAudio("sine=frequency=440:duration=3", before_options="-f lavfi"))
         await interaction.followup.send(
             f"Joined {voice.channel.mention}. I'll read messages from this channel "
             "(only from people in the same voice channel as me).",
@@ -167,6 +169,7 @@ class TTS(commands.Cog):
     # ------------------------------------------------------------------
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        print(f"got message: {message.content!r} in channel {message.channel.id}")
         if message.author.bot or message.guild is None:
             return
 
