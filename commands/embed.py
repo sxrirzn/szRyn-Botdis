@@ -30,8 +30,8 @@ def save_embed_template(
 
 def create_greet_embed():
     return discord.Embed(
-        title="Welcome!",
-        description="Hello!",
+        title="successfully created an embed",
+        description="Please click the button below to enter your information.",
         color=discord.Color.from_rgb(178, 134, 223)
     )
 
@@ -337,7 +337,7 @@ class EmbedGroup(app_commands.Group):
 
     
     @app_commands.command(
-        name="test greet",
+        name="test_greet",
         description="Test the greet embed"
     )
 
@@ -373,7 +373,7 @@ class EmbedGroup(app_commands.Group):
         )
 
     @app_commands.command(
-        name="set greet message",
+        name="set_greet_message",
         description="Set the greet message for new members"
     )
     @app_commands.describe(message="The message to display when a new member joins")
@@ -413,7 +413,7 @@ class EmbedGroup(app_commands.Group):
         )
 
     @app_commands.command(
-        name="set greet",
+        name="set_greet",
         description="Set the channel for the greet embed"
     )
     @app_commands.describe(channel="The channel to send the greet embed in")
@@ -452,5 +452,5 @@ class EmbedGroup(app_commands.Group):
             ephemeral=True
         )
 
-    async def setup(bot):
-        bot.tree.add_command(EmbedGroup())
+async def setup(bot):
+    bot.tree.add_command(EmbedGroup())
