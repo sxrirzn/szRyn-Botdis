@@ -16,20 +16,20 @@ MAX_CHARS = 200      # max characters read per message
 LANGUAGES = {
     "ไทย (Thai)": "th",
     "English": "en",
-    "日本語 (Japanese)": "jp",
+    "日本語 (Japanese)": "ja",
     "한국어 (Korean)": "ko",
-    "中文 (Chinese)": "cn",
+    "中文 (Chinese)": "zh-CN",
     "Español (Spanish)": "es",
     "Français (French)": "fr",
     "Deutsch (German)": "de",
     "Bahasa Indonesia (Indonesian)": "id",
-    "Tiếng Việt (Vietnamese)": "vn",
+    "Tiếng Việt (Vietnamese)": "vi",
     "Русский (Russian)": "ru",
     "हिन्दी (Hindi)": "hi",
 }
 
 # Word spoken in place of a URL (falls back to "link" for other languages)
-LINK_WORDS = {"th": "ลิงก์"}
+LINK_WORDS = {"th": "link"}
 
 URL_RE = re.compile(r"https?://\S+")
 CUSTOM_EMOJI_RE = re.compile(r"<a?:(\w+):\d+>")
@@ -86,23 +86,32 @@ class TTS(commands.Cog):
             try:
                 # gTTS is blocking, so run it in a separate thread
                 await asyncio.to_thread(self._make_mp3, text, path, lang)
+                print(f"TTS file: {os.path.getsize(path)} bytes, lang={lang}")
+
+                # wait if something else (e.g. the join beep) is still playing
+                while vc.is_playing():
+                    await asyncio.sleep(0.1)
 
                 done = asyncio.Event()
-                vc.play(
-                    discord.FFmpegPCMAudio(path),
-                    after=lambda err: loop.call_soon_threadsafe(done.set),
-                )
+
+                def _after(err):
+                    if err:
+                        print(f"Playback error: {err}")
+                    loop.call_soon_threadsafe(done.set)
+
+                vc.play(discord.FFmpegPCMAudio(path), after=_after)
                 await done.wait()
             except asyncio.CancelledError:
                 raise
-            except Exception as e:
-                print(f"TTS error: {e}")
+            except Exception:
+                import traceback
+                traceback.print_exc()
             finally:
                 try:
                     os.remove(path)
                 except OSError:
                     pass
-
+    
     # ------------------------------------------------------------------
     # Slash commands: /join | /leave | /skip | /lang
     # ------------------------------------------------------------------
