@@ -335,6 +335,122 @@ class EmbedGroup(app_commands.Group):
             view=EmbedEditorView()
         )
 
+    
+    @app_commands.command(
+        name="test greet",
+        description="Test the greet embed"
+    )
 
-async def setup(bot):
-    bot.tree.add_command(EmbedGroup())
+    async def test_greet(self, interaction: discord.Interaction):
+
+        if interaction.guild is None:
+            await interaction.response.send_message(
+                "This command can only be used in a server.",
+                ephemeral=True
+            )
+            return
+
+        config = load_config()
+        existing = (
+            config.get(str(interaction.guild.id), {})
+            .get("embed_templates", {})
+            .get("greet")
+        )
+
+        if not existing:
+            await interaction.response.send_message(
+                "No greet embed template found. Use `/embed create greet` to create one.",
+                ephemeral=True
+            )
+            return
+
+        embed = discord.Embed.from_dict(existing)
+
+        await interaction.response.send_message(
+            content="Testing the greet embed:",
+            embed=embed,
+            ephemeral=True
+        )
+
+    @app_commands.command(
+        name="set greet message",
+        description="Set the greet message for new members"
+    )
+    @app_commands.describe(message="The message to display when a new member joins")
+    async def set_greet_message(self, interaction: discord.Interaction, message: str):
+
+        if interaction.guild is None:
+            await interaction.response.send_message(
+                "This command can only be used in a server.",
+                ephemeral=True
+            )
+            return
+
+        config = load_config()
+        existing = (
+            config.get(str(interaction.guild.id), {})
+            .get("embed_templates", {})
+            .get("greet")
+        )
+
+        if not existing:
+            await interaction.response.send_message(
+                "No greet embed template found. Use `/embed create greet` to create one.",
+                ephemeral=True
+            )
+            return
+
+        existing["description"] = message
+        save_embed_template(
+            interaction.guild.id,
+            "greet",
+            discord.Embed.from_dict(existing)
+        )
+
+        await interaction.response.send_message(
+            content="Greet message updated successfully.",
+            ephemeral=True
+        )
+
+    @app_commands.command(
+        name="set greet",
+        description="Set the channel for the greet embed"
+    )
+    @app_commands.describe(channel="The channel to send the greet embed in")
+    async def set_greet_channel(self, interaction: discord.Interaction, channel: discord.TextChannel):
+
+        if interaction.guild is None:
+            await interaction.response.send_message(
+                "This command can only be used in a server.",
+                ephemeral=True
+            )
+            return
+
+        config = load_config()
+        existing = (
+            config.get(str(interaction.guild.id), {})
+            .get("embed_templates", {})
+            .get("greet")
+        )
+
+        if not existing:
+            await interaction.response.send_message(
+                "No greet embed template found. Use `/embed create greet` to create one.",
+                ephemeral=True
+            )
+            return
+
+        existing["channel"] = channel.id
+        save_embed_template(
+            interaction.guild.id,
+            "greet",
+            discord.Embed.from_dict(existing)
+        )
+
+        await interaction.response.send_message(
+            content="Greet channel updated successfully.",
+            ephemeral=True
+        )
+
+    async def setup(bot):
+        bot.tree.add_command(EmbedGroup())
