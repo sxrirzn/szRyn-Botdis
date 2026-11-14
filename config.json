@@ -7,7 +7,11 @@
         "embed_templates": {
             "greet": {
                 "author": {
-                    "name": "{USER_NAME}"
+                    "name": "{USER_NAME}",
+                    "icon_url": "{USER_AVATAR}"
+                },
+                "thumbnail": {
+                    "url": "{USER_AVATAR}"
                 },
                 "flags": 0,
                 "color": 11699935,

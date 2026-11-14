@@ -4,6 +4,30 @@ from discord import app_commands
 
 from commands.settings import load_config, save_config
 
+import json
+
+AVATAR_PLACEHOLDER = "{USER_AVATAR}"
+
+
+def get_template(guild_id, name="greet"):
+    return (
+        load_config()
+        .get(str(guild_id), {})
+        .get("embed_templates", {})
+        .get(name)
+    )
+
+
+def render_embed(template: dict, member) -> discord.Embed:
+    """แทน {USER_AVATAR} ด้วยรูปจริงของ member"""
+    text = json.dumps(template).replace(
+        AVATAR_PLACEHOLDER, member.display_avatar.url
+    )
+    return discord.Embed.from_dict(json.loads(text))
+
+
+def is_valid_url(value: str) -> bool:
+    return value == AVATAR_PLACEHOLDER or value.startswith(("https://", "http://"))
 
 def save_embed_template(
     guild_id,
@@ -29,12 +53,19 @@ def save_embed_template(
 
 
 def create_greet_embed():
-    return discord.Embed(
-        title="Welcome!",
-        description="Hello!",
-        color=discord.Color.from_rgb(178, 134, 223)
-    )
-
+    return discord.Embed.from_dict({
+        "title": "Welcome to Nightshift Studio 👋",
+        "description": "Glad you're here! Grab a role, say hi and make yourself at home.",
+        "color": 5793266,
+        "thumbnail": {"url": AVATAR_PLACEHOLDER},  # ใช้รูปของ user ที่เข้ามา
+        "fields": [
+            {"name": "📜 Rules", "value": "<#111111111111111111>", "inline": True},
+            {"name": "🎭 Roles", "value": "<#222222222222222222>", "inline": True},
+            {"name": "💬 Introduce yourself", "value": "<#333333333333333333>", "inline": True},
+        ],
+        "footer": {"text": "Member #1,248"},
+        "timestamp": "2026-09-17T12:00:00.000Z",
+    })
 
 
 # Embed Editor Modal
@@ -120,8 +151,12 @@ class EmbedEditModal(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction):
 
-        message = self.message
-        embed = message.embeds[0] if message.embeds else discord.Embed()
+        template = get_template(self.guild_id) if self.guild_id else None
+        embed = (
+            discord.Embed.from_dict(template)
+            if template
+            else discord.Embed()
+        )
 
         if self.edit_type == "Basic Information":
 
@@ -152,23 +187,16 @@ class EmbedEditModal(discord.ui.Modal):
             author_text = self.author_input.value.strip()
             author_image = self.author_image_input.value.strip()
 
-            self.use_member_avatar = (
-                author_image == "{USER_AVATAR}"
-            )
-
-            if self.use_member_avatar:
-                author_image = ""
-
-            if author_image and not author_image.startswith(
-                ("https://", "http://")
-            ):
+            if author_image and not is_valid_url(author_image):
                 await interaction.response.send_message(
                     "Please enter a valid image URL or {USER_AVATAR}.",
                     ephemeral=True
                 )
                 return
 
-            if author_text or author_image or self.use_member_avatar:
+            self.use_member_avatar = author_image == AVATAR_PLACEHOLDER
+
+            if author_text or author_image:
                 embed.set_author(
                     name=author_text or "Welcome",
                     icon_url=author_image or None
@@ -182,40 +210,50 @@ class EmbedEditModal(discord.ui.Modal):
 
         elif self.edit_type == "Images":
 
-            if self.image_input.value:
-                embed.set_image(url=self.image_input.value)
+            image = self.image_input.value.strip()
+            thumb = self.thumbnail_input.value.strip()
 
-            if self.thumbnail_input.value:
-                embed.set_thumbnail(url=self.thumbnail_input.value)
+            for value in (image, thumb):
+                if value and not is_valid_url(value):
+                    await interaction.response.send_message(
+                        "Please enter a valid URL or {USER_AVATAR}.",
+                        ephemeral=True
+                    )
+                    return
+
+            if image:
+                embed.set_image(url=image)
+
+            if thumb:
+                embed.set_thumbnail(url=thumb)
+
 
         try:
-
-            await message.edit(embed=embed)
+            # preview: แทน placeholder ด้วยรูปของคนที่กดแก้
+            await self.message.edit(
+                embed=render_embed(embed.to_dict(), interaction.user)
+            )
 
             if self.guild_id:
-
-                avatar_setting = (
-                    self.use_member_avatar
-                    if self.edit_type == "Author"
-                    else None
-                )
-
                 save_embed_template(
                     self.guild_id,
                     "greet",
-                    embed,
-                    use_member_avatar=avatar_setting
+                    embed,  # เซฟแบบที่ยังเป็น {USER_AVATAR}
+                    use_member_avatar=(
+                        self.use_member_avatar
+                        if self.edit_type == "Author"
+                        else None
+                    )
                 )
 
             await interaction.response.send_message(
-                "Embed updated and saved successfully!",
-                ephemeral=True
+                content=f"Created an embed with name `{name}`.",
+                embed=render_embed(embed.to_dict(), interaction.user),
+                view=EmbedEditorView()
             )
 
         except discord.HTTPException as e:
-
             print(f"Embed Edit Error: {e}")
-
             await interaction.response.send_message(
                 "Failed to update embed. Please check the URLs and fields.",
                 ephemeral=True
